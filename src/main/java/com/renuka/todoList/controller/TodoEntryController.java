@@ -44,6 +44,4 @@ public class TodoEntryController {
         return ResponseEntity.ok(deleted);
     }
 
-
-
 }
