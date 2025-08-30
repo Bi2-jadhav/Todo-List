@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/todo")
+@RequestMapping("/api/todo")
+
 public class TodoEntryController {
 
     @Autowired
