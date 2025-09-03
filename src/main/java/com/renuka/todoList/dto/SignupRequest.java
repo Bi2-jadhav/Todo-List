@@ -3,8 +3,6 @@ package com.renuka.todoList.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-
-
 public class SignupRequest {
     private String email;
     private String password;

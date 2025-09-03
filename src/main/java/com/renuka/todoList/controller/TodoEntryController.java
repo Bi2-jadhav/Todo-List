@@ -2,6 +2,7 @@ package com.renuka.todoList.controller;
 
 import com.renuka.todoList.entity.TodoEntry;
 import com.renuka.todoList.service.TodoService;
+import com.renuka.todoList.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,32 +18,59 @@ public class TodoEntryController {
     @Autowired
     private TodoService todoService;
 
-    //create a new todo
-    @PostMapping("/createTask")
-    public ResponseEntity<TodoEntry> createTask(@RequestBody TodoEntry todo) {
-        TodoEntry createdTodo = todoService.saveEntry(todo);
-        return new ResponseEntity<>(createdTodo, HttpStatus.CREATED); // 201 Created
-    }
-    @GetMapping("/allTask")
-    public ResponseEntity<List<TodoEntry>> getAllTask(){
-        return ResponseEntity.ok(todoService.getAllTask());
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    private String getEmailFromToken(String token) {
+        return jwtUtil.extractUsername(token.substring(7)); // remove "Bearer "
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TodoEntry> getTaskById(@PathVariable Long id){
-        return ResponseEntity.ok(todoService.getTaskById(id));
+    @PostMapping("/createTask")
+    public ResponseEntity<TodoEntry> createTask(
+            @RequestBody TodoEntry todo,
+            @RequestHeader("Authorization") String token) {
+
+        String email = jwtUtil.extractUsername(token.substring(7)); // remove "Bearer "
+        TodoEntry createdTodo = todoService.saveEntry(todo, email);
+        return new ResponseEntity<>(createdTodo, HttpStatus.CREATED);
     }
+
+    @GetMapping("/allTask")
+    public ResponseEntity<List<TodoEntry>> getAllTasks(
+            @RequestHeader("Authorization") String token) {
+
+        String email = getEmailFromToken(token);
+        return ResponseEntity.ok(todoService.getUserTasks(email));
+    }
+
 
     @PutMapping("/{id}")
-    public ResponseEntity<TodoEntry> updateTask(@PathVariable long id, @RequestBody TodoEntry todoDetails){
-        TodoEntry updatedTodo = todoService.updateTodo(id,todoDetails);
+    public ResponseEntity<TodoEntry> updateTask(
+            @PathVariable long id,
+            @RequestBody TodoEntry todoDetails,
+            @RequestHeader("Authorization") String token) {
+
+        String email = getEmailFromToken(token);
+        TodoEntry updatedTodo = todoService.updateTask(id, todoDetails, email);
         return ResponseEntity.ok(updatedTodo);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<TodoEntry> deleteTaskById(@PathVariable long id){
-        TodoEntry deleted = todoService.deleteTaskById(id);
-        return ResponseEntity.ok(deleted);
+    public ResponseEntity<String> deleteTaskById(
+            @PathVariable long id,
+            @RequestHeader("Authorization") String token) {
+
+        String email = getEmailFromToken(token);
+        todoService.deleteTaskById(id, email);
+        return ResponseEntity.ok("Task deleted successfully");
     }
+
+
+
+
+
+
+
+
 
 }

@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
             try {
-                email = jwtUtil.extractEmail(token);
+                email = jwtUtil.extractUsername(token);
             } catch (ExpiredJwtException e) {
                 System.out.println("JWT expired: " + e.getMessage());
             } catch (Exception e) {
@@ -45,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // If we got email & SecurityContext is empty, set authentication
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            if (jwtUtil.validateToken(token)) {
+            if (jwtUtil.validateToken(token, email)) {
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(email, null, null);
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

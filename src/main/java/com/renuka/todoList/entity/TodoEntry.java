@@ -25,6 +25,21 @@ public class TodoEntry {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    public UserAuthEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserAuthEntity user) {
+        this.user = user;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "user_id" , nullable = false)
+    private UserAuthEntity user;
+
+
+
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

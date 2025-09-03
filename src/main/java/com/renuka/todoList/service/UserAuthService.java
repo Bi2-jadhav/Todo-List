@@ -54,8 +54,6 @@ public class UserAuthService {
         userAuthRepo.save(user);
     }
 
-
-
     public JwtResponse login(LoginRequest req) {
         Optional<UserAuthEntity> userOpt = userAuthRepo.findByEmail(req.getEmail());
         if (userOpt.isEmpty()) throw new RuntimeException("Invalid email");
